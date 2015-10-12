@@ -1,0 +1,8 @@
+name: CLT_coin
+account: amachno
+server: shinyapps.io
+bundleId: 281107
+url: https://amachno.shinyapps.io/CLT_coin
+when: 1444056423.21524
+asMultiple: FALSE
+asStatic: FALSE

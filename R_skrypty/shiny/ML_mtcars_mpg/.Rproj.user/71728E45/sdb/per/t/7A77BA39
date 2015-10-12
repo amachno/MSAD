@@ -1,0 +1,17 @@
+{
+    "contents" : "\nlibrary(shiny)\n\nshinyUI(fluidPage(\n      \n      # Application title\n      titlePanel(\"Metoda największej wiarygodności\"),\n      \n      # Sidebar with a slider input for sample size and the probability\n      sidebarLayout(\n            sidebarPanel(\n                  radioButtons(\"type\",\n                              \"Estymowany parametr\",\n                              c(\"średnia\", \"Odchylenie sdandardowe\")),\n                  sliderInput(\"value\",\n                              \"Wartość nieestymowanego parametru:\",\n                              min = 0,\n                              max = 30,\n                              value = 10,\n                              step = .1)\n            ),\n            # Show a plot of the generated distribution\n            mainPanel(\n                  p(\"To jest wizualizacja działania metody największej wiarygodności.\"),\n                  p(\"Dane użyte do analizy to średni dystans na galonie (mpg),\n                    wartości są z zestawu danych mtcars dostępnego w pakiecie databases\"),\n                  p(\"Możemy ustalić jaki parametr chcemy estymować, \n                    wartość drugiego z parametrów możemy ustalić na suwaku.\"),\n                  p(\"Wynikiem jest wykres log wiarygodności od wartości parametru\"),\n                  plotOutput(\"finalPlot\")\n                  )\n      )\n      ))\n",
+    "created" : 1444123079492.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1450486977",
+    "id" : "7A77BA39",
+    "lastKnownWriteTime" : 1444125888,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/shiny/ML_mtcars_mpg/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

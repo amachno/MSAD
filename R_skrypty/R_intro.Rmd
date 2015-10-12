@@ -1,0 +1,326 @@
+---
+title: "Wprowadzenie do R"
+author: "A. M. Machno"
+date: "28 września 2015"
+output: html_document
+---
+
+##Referencje
+
+R. Peng, R Programming [link](https://leanpub.com/rprogramming)
+
+##Kalkulator
+
+Środowisko R można wykorzystac do właściwie dowolnych obliczeń arytmetycznych na liczbach. 
+To co jest wyświetlane w szarej ramce wpisane należy wpisać do konsoli i po wciśnieciu *enter* otrzymamy to co jest w białej ramce (po ##). 
+
+```{r}
+1+15
+4/2
+6^3
+625^(.5)
+(1+3)/(2+3^2)
+```
+
+##Funkcje
+
+Możemy korzystać z ogromnej ilości funkcji wbudowanych w R oraz tworzyć własne. Funkcję wywołujemy wpisując jej nazwę oraz argumenty w nawiasie okrągłym.
+
+-pierwiastek:
+```{r}
+sqrt(64)
+```
+
+-funkcja eksponencjalna
+```{r}
+exp(2)
+```
+
+Aby dowiedzieć się więcej na temat danej funkcji wpisujemy `?nazwa_funkcji`. Niektóre funkcje mają więcej argumentów, np. funkcja licząca logarytm (`log`) ma dwa argumenty (liczbę, której logarytm chcemy policzy.c oraz podstawę logarytmu). W takiej sytuacji musimy musimy podac dwa argumenty.
+
+liczymy $log_2 (16)$:
+```{r}
+log(16, 2)
+```
+
+Spoglodając do opisu funkcji `log` możemy dowiedzieć się, że liczba logarytmowana to argument `x`, a podstawa to argument `base`. Wywołując funkcję możemy odwołać się do tych nazw nie pamietając o kolejności argumentów.
+
+```{r}
+log(x=27, base=3)
+log(base=3, x=27)
+```
+
+Niektóre agumenty mają wartości domyślne (właściwie to jest bardzo częsty przypadek). W przypadku logarytmu, argument `base` ma wartość domyślną równą *e*. Zatem jeżeli chcemy policzyć logarytm naturalny nie musimy wpisywać podstawy.
+
+```{r}
+log(2)
+log(x=12)
+```
+
+Jednak jeżeli funkcja nie ma wartości domyślnej do argumentu, nie wpisując wartości otrzymamy błąd. Np. `log(base=5)`.
+
+Wiele funkcji nie ma argumentów, lub wszystkie jej argumenty mają wartości domyślne, i tak możemy dowiedzieć się w jakim katalogu pracujemy wpisując `getwd()` lub wyświetlając wszystkie obiekty, które przechowujemy w naszym środowisku `ls()`. 
+```{r}
+getwd()
+ls()
+```
+
+Jeszcze nie stworzyliśmy ani nie wczytaliśmy nic do naszego środowiska, dlatego wyświetla pustą listę. 
+
+##Wektory
+
+Podstawowymi wartościami w R są wektory. Podstawową funkcją, która tworzy wektor jest `c()`.
+
+```{r}
+c(1,3,11,-1,.3)
+```
+
+Pracując na wektorach, przeważnie chcemy przypisać jakiejś zmiennej wartości. Stórzmy zatem dwa 5-elementowe wektory `x` i `y`. Do przypisywania wartości służy operator `<-` (lub `->`).
+
+```{r}
+x<-c(2, -1, 3, 1.5, -.5)
+y<-c(1, 2, 3, -1, -5)
+```
+
+Tym razem po wpisaniu komend do consoli nie dostaliśmy żadnej odpowiedzi, ale możemy odwołać sie do zmiennych.
+
+```{r}
+x; y
+```
+
+Wszystkie podstawowe funkcje liczbowe możemy stosować do wektorów. Działania są wykonywane dla pierwszych elementów wektorów i wartość jest pierwszym elementem wektora wyniku itd. Innymi słowy jest działanie wyraz po wyrazie. 
+
+```{r}
+exp(x)
+x+y
+x/y
+x^y
+```
+
+Wiele funkcji jako argument (lub kilka argumentów) ma wektor. Podstawowe to np. suma `sum()`, średnia arytmetyczna `mean()`.
+
+```{r}
+sum(x); sum(y)
+mean(x); mean(y)
+```
+
+Dzieki temu bardzo szybko możemy policzyć np. wariancję `x`:
+
+```{r}
+mean((x-mean(x))^2); mean((y-mean(y))^2)
+sum((x-mean(x))^2)/length(x); sum((y-mean(y))^2)/length(y)
+sum((x-mean(x))^2)/(length(x)-1); sum((y-mean(y))^2)/(length(y)-1)
+```
+
+Oczywiście jest też funckja `var()`, która oblicza wariancję dla wartości z wektora.
+```{r}
+var(x); var(y)
+```
+
+##Obiekty podstawowe
+
+W R rozróżniamy 6 podstawowych typów obiektów (które przeważnie są elementami wektora): 
+
+1. character (napis). Wpisujemy w cudzysłowiu, np. `"to jest napis"`.
+2. complex (liczba zespolona). Wpisujemy cześć rzeczywistą plus część urojoną *i*, bez znaku mnożenia, np. `1+2i`.
+3. numeric (liczba rzeczywista). Po prosu wpisujemy liczbę, może byc poprzedzona minusem aby była ujemna, część dziesiętna po **kropce**.
+4. integer (liczba naturalna). Wpisujemy liczbę i *L*, np. `2L`.
+2. factor (zmienna kategoryczna).
+5. logical (wartość logiczna TRUE/FALSE). Wpsujemy `TRUE` lub `FALSE`, przekształcane są w odpowiednio 1 i 0.
+
+Rozróżnienie jest ważne, dlatego, że wektory muszą być jednorodne ze względu na obiekty (wszystkie elementy wektora muszą mieć ten sam typ). Typy wypisałem w nieprzypadkowej kolejności, zamiana wektora, który ma wyższy typ bezproblemowo zamienimy na tym niższy, odwrotna operacja przeważnie nie jest możliwa. Jezeli spróbujemy stworzyć wektor niejednorodny, R wybierze obiekt najniższego rzędu w tym wektorze i pozostałe lementy przekształci w ten tym. 
+
+```{r}
+mix_vect_1<-c(1L, TRUE, 2+3i)
+typeof(mix_vect_1); mix_vect_1
+
+mix_vect_2<-c(1,2, 'napis')
+typeof(mix_vect_2); mix_vect_2
+```
+
+Z punktu widzenia tego kursu najważniejsze są wektory numeryczne i logiczne (okazjonalnie będziemy korzystać z napisów).
+
+##Wartości specjalne
+
+W wyniku niektórych operacji możemy otrzymac nieksończoność `Inf`. Nieskończoność możemy też używać do obliczeń.
+```{r}
+1/0
+.99^Inf
+```
+
+Jednak niektórych działań nie da się wykonać i otrzymamy liczbe nioznaczoną.
+
+```{r}
+0/0
+(-1)^.1
+```
+
+Jeżeli chcielibysmy przekształcić napis w liczbę, a napis nie będzie liczba otrzymamy również wartość nieoznaczoną:
+
+```{r}
+as.numeric(mix_vect_2)
+```
+
+Widzimy, że dwa pierwsze lementy przekształcono w liczny, a trzeci został zastąpiony przez `NA`. Różnicą między `NaN` i `NA` nie będziemy się zajmować i obie będziemy traktować jak wartości brakujące lub błędne w zalezności od kontekstu.
+
+##Atrybuty
+
+Wiele obiektów w R posiada atrybuty, w szczególności wektory. Przykładowe atrybuty to:
+
+- names, dimnames (nazwa, nazwa wymiarów dla macierzy i innych wielowymiarowych obiektów).
+- dim (wymiar).
+- class (klasa).
+- length (długość).
+
+Wszystkie atrybuty danego obiektu możemy uzyskać dzięki funkcji `attributes()`.
+
+Przypiszemy nazwy wartościom w wektorze `mix_vect_1`, odpowiadjące jego klasie.
+
+```{r}
+names(mix_vect_1)
+names(mix_vect_1)<-c('integer', 'logical', 'complex')
+names(mix_vect_1)
+mix_vect_1
+```
+
+##Podzbiory
+
+Aby otrzymać konkretną współrzędna wektora odwołujemy sie do niego w nawiasie kwadratowym. Trzeci element wektora *x* to:
+
+```{r}
+x[3]
+```
+
+Aby otrzymać wektor, składający się z wektora *x* bez jego trzeciego elementu poprzedzamy to znakiem minus:
+
+```{r}
+x[-3]
+```
+
+Możemy odwołać się do wektora, składającego się z trzeciego i piątego elementu *x*:
+
+```{r}
+x[c(3,5)]
+```
+
+**Ważne**: odwołanie jest wektorem a nie ciągiem liczb!
+
+##Operatory i warunkowanie logiczne
+
+Podstawowe operatory logiczne to koninkcja `&`, alternatywa `|` i negacja `!`. W zastosowaniach najczęstsze waunki, które nas interesują to czy zachodzi równość `==`, nierówność `!=`, mniejszość `<`, niewiększość `<=`, większość `>` i niemniejszość `>=`.
+
+Sprawdźmy czy 2 jest większe od 3:
+
+```{r}
+2>3
+```
+
+Możemy w jednej komendzie sprawdzić, które elementy *x* są ujemne:
+
+```{r}
+x<0
+```
+
+lub, które lementy *x* są niemnijesze niż odpowiednie elementy *y*:
+
+```{r}
+x>=y
+```
+
+Dzięki wektorom logicznym, możemy otrzymać wszystkie dodatnie wartości z wektora *y*:
+
+```{r}
+y[y>0]
+```
+
+Szczególnie wygodne i użyteczne jest używanie warunków logicznych do konstrukcji podzbiorów. Jakie wartości przyjmuje *x* jeżeli y jest dodatni?
+
+```{r}
+x[y>0]
+```
+
+##Statystyka Opisowa
+
+Przykładowe statystyki opisowe, dla których są funkcje w podstawowym pakiecie R to:
+
+- średnia `mean()`
+- mediana `median()`
+- odchylenie standardowe `sd()`
+- odchylenie średnie `aad()`
+- kwantyl (w szczególności kwartyle) `quantile`
+
+Przykładowe statystyki opisowe, dla których nie ma funkcji w podstawowym pakiecie R to:
+
+- dominanta
+- skośność
+- kurtoza
+
+
+##Przykłady
+
+Wczyutajmy dane `mtcars`, które są dostępny w podstawowym pakiecie R.
+
+```{r}
+data(mtcars)
+str(mtcars)
+```
+
+Jest to ramka danych (*data.frame*) składająca się z 32 obserwacji i 11 wartości dla każdej z nich. Są to dane techniczne 32 modeli samochodów.
+
+Ramke danych możemy traktować jak dwuwymiarową tablicę i odwoływać się do elementów przez nawias kwadratowy. Gdzie na pierwszej współrzędnej podajemy które wiersze mają być wyswietlone, a na drugiej, które kolumny. Po pozostawieniu pustego wymiaru, wszystkie lementy zostana wyswietlone.
+
+```{r}
+mtcars[1,c(1,2)]
+mtcars[,3]
+```
+
+Możemy odwołać sie do zmiennej w danych przez jej nazwę iznak dolara:
+
+```{r}
+#liczba cylindrów w kolejnych samochodach
+mtcars$cyl
+```
+
+Policzmy średnią masę samochodów z bazy `mtcars`
+
+```{r}
+mean(mtcars$wt)
+```
+
+Policzmy teraz średnią masę dla samochodów z 8 cylindrami:
+
+```{r}
+#dla jasności wprowadzamy nowe wektory odpowiadające wadze i ilości cylindrów
+weight<-mtcars$wt
+cylinders<-mtcars$cyl
+mean(weight[cylinders==8])
+```
+
+Na histogramie objętości silników, widzimy, że dane są lekko niesymetryczne:
+
+```{r}
+hist(mtcars$disp, main="Histogram", col=2, xlab="objetość (cale sześcienne)", ylab="ilość")
+abline(v=mean(mtcars$disp), lw=3)
+```
+
+Policzmy zatem skośność:
+
+```{r}
+#dla wygody tworzymy nową zmienną
+disp<-mtcars$disp
+
+#liczmy średnią
+disp.mean<-mean(disp)
+
+#i odchylenia od średniej
+disp.dev<-disp-disp.mean
+
+#trzecia potęga odchyleń i srednia
+disp.dev.3<-disp.dev^3
+
+#to jest trzeci moment centralny
+disp.dev.3.mean<-mean(disp.dev.3)
+
+#skośność
+  disp.dev.3.mean/sd(disp)^3
+```

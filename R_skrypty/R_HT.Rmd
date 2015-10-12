@@ -1,0 +1,129 @@
+---
+title: "Testowanie hipotez"
+author: "A. M. Machno"
+date: "6 października 2015"
+output: html_document
+---
+
+##Test jednej średniej
+
+Test jednej średniej jest testem, który bazuje na przedziałach ufności, które wcześniej definiowaliśmy.
+
+Wracając do przykładu ze spalaniem.
+
+```{r}
+data("mtcars")
+
+
+#średnia z próby
+mu<-mean(mtcars$mpg)
+#odchylenie standardowe
+sigma<-sd(mtcars$mpg)
+```
+
+Przedział dla, którego nie odrzucamy $H_0: \mu=25$ na rzecz dwustronnej hipotezy alternatywnej przy poziomie istotności 90% to:
+```{r}
+round(25+c(-1,1)*sigma/sqrt(32)*qnorm(.95),2)
+```
+
+Analogocznie tworzymy zbiory krytyczne dla testów jednostronnych. 
+
+**Ważne**: interpretacja wyników to: jeżeli średnia z próby należy do przedziału krytycznego (czy nie należy to tego przedziału, który jest wypisany na górze) odrzucamy $H_0$ i zakładamy prawdziwość $H_1$ (na poziomie istotności 90%). Trudniejsza jest interpretacja wyniku jeżeli średnia nie należy do zbioru krytycznego, wtedy nie ma podstaw do odrzucenia $H_0$ (na poziomie istotności 90%). W praktyce zakładamy wtedy najczęściej prawdziwość $H_0$, ale nie dlatego, że mamy dowody na jej prawdziwość tylko dlatego, że nie mamy dowodów na jej nieprawdziwość.
+
+##Test dwóch średnich
+
+Często jesteśmy zainteresowani istotnością różnic jakiejś cechy w dwóch zbiorach. 
+
+- Czy kobiety są niższe od męszczyzn?
+- czy bieganie jest zdrowsze od pływania? (aby odpowiedzieć na to pytanie przy pomocy badań ilościowych należy przeformuować pytanie)
+- który piłkarz strzela więcej goli: C. Ronaldo czy L. Messi?
+
+
+Przy użyciu R, bardzo łatwo jest przeprowadzic takie testy prze pomocy funkcji `t.test`.
+
+Sprawdźmy zatem działanie tej funkcji na przykladzie spalania samochodów. Zbadamy, czy samochody ze skrzynią automatyczna spalają więcej niż samochody ze skrzynią manualną.
+
+```{r}
+#spalanie samochodów ze skrzynią automatyczną
+mpg.a<-mtcars$mpg[mtcars$am==0]
+#spalanie samochodów ze skrzynią manualną
+mpg.m<-mtcars$mpg[mtcars$am==1]
+
+#przeprowadzamy test
+am.test<-t.test(mpg.a, mpg.m, paired=F)
+
+#p-value
+am.test$p.value
+
+#95% przedział ufności dla różnicy średnich
+round(am.test$conf.int,2)
+
+```
+
+Wnioskujemy stąd, że możemy odrzucic hipotezę o równości średnich w spalaniu. Na 95% średni dystans na galonie dla samochodów ze skrzynia automatyczną jest mniejszy od średniego dystansu na galonie dla samochodów ze skrzynią manualną, różnica na 95% jest w przedziale (3.21, 11.28)
+
+**Uwaga**: podany test dwóch średnich jest dla danych nisparowanych. Jeżeli chcielibyśmy zbadać wydajność dwóch procesorów i na każdym z nich przeprowadzamy 10 różnych (ty samych dla obu) operacji to mamy do czynienia z testem sparowanym. W tym przypadku liczymy różnice między czasem wykonywania każdej z operacji dla obu procesorów i na tych różnicach stosujemy test jednej śreniej!
+
+##Test ANOVA
+
+Możemy spotkać się z problemem, w którym interesuje nas wpływ jakiegoś czynnika na średnią. Dla czynnika kategorycznego wykorzystujemy analizę wariancji (ANOVA). Czynniki liczbowe możemy zawsze przekształcić na kategoryczne, ale to musi byc robione uważnie. 
+
+Kontynuując przykład ze spalaniem samochodów, mogłoby nas czy ilość cylindrów (4, 6 lub 8) ma wpływ na spalanie. Oczywiście moglibyśmy przeprowadzic 3 testy dwóch średnich, ale wtedy interpretacja wyników musi byc przeporwadzona delikatnie, ponieważ trudno określić prawdziwą istotność testu składającego się z 3 testów. Dlatego jeżeli nie interesują nas konkretne różnice, tylko czy wp.ływ jest istotny, najlepszym rozwiązaniem jest test ANOVA.
+
+W R mamy wbudowaną funkcję `anova`, która przeprowadza test ANOVA. My uzyjemy go tylko w najprostszej postaci, czyli jednoczynnikowej-jednowymiarowej ANOVA.
+
+```{r}
+#model zakładający tę samą średnią
+model.0<-lm(mpg~1, data=mtcars)
+#model dopuszczający różne średnie dla różnej ilości cylindrów (różnego poziomu czynnika 'cyl')
+model.1<-lm(mpg~cyl, data=mtcars)
+
+#test ANOVA
+anova(model.0,model.1)
+```
+
+Co jest najwazniejsze w tym wyniku to p-value, które należy interpretować jako jeden minus maksymalny poziom istotności na jakim nie mamy podstaw do odrzucenia hipotezy zerowej.
+
+W naszym przypadku p-value jest bardzo małe ($6\cdot 10^{-10}$), a więc odrzucamy hipotezę zerową z na dowolnym racjonalnym poziomie istotności. **Wniosek**: liczba cylindrów ma istotny wpływ na średnie spalanie.
+
+Zauważmy, że test ANOVA nie daje nam informacji, który poziom czynnika ma dodatni, a który ujemny wpływ na spalanie. Nie mamy też informacji, czy wszystkie poziomy czynnika sa między sobą różne, tzn. czy wpływają na spalanie. 
+
+##Test niezależności $\chi^2$
+
+Możemy spotkać się z problemem czy poziom jednej cechy wpływa na poziom innej cechy w populacji. Najprostszymi przykładamy są wpływ płci na inną cechę (np. wykształcenie lub stanowisko w firmie) i wpływ rasy na inną cechę (w Polsce to mniej interesujące zagadnienie).
+
+Kontynuując analizę danych `mtcars`, zbadajmy czy istenieje związek między ilością cylindrów, a typem skrzyni biegów. Test $\chi^2$ w R przeprowadza się funckją `chisq.test`. Wyświetlmy najpierw tablicę odpowiednich danych, i sprawdźmy czy na oko jesteśmy w stanie stwierdzić zależność.
+
+```{r}
+table(mtcars$cyl, mtcars$am)
+```
+
+Widać, że różnice są duże, czym więcej cylidnrów tym większy procent. 
+
+```{r}
+chisq.test(table(mtcars$cyl, mtcars$am))
+```
+
+P-value testu jest większe niż 0.01, zatem jezeli testowalibyśmy hipoteże o niezależności na poziomie istotności 99%, to nie mielibyśmy podstaw do jej odrzucenia.
+
+##Test zgodności $\chi^2$
+
+Przeanalizujemy najprostszy przypadek testu zgodności dla zmiennej losowej dyskretnej o skończonej ilości mozliwych resultatów. Podstawowe przyklady takich zmiennych to rzut moneta oraz rzut kostką do gry.
+
+Wylosujemy 100 obserwacji z rozkłady Bernulliego z prawdopodobieństwem sukcesu 55% i przetestujemy czy możemy na poziomie istotności 99% odrzucić hipotezę zerową (*p=0.5*). Ten przykład jest sztuczny, ponieważ my losując znamy *p*, które jest różne od 0.5, alę będziemy mogli zaobserwować działanie tego testu.
+
+```{r}
+set.seed(131)
+
+#losujemy próbkę 100 obserwacji z rokzładu Bernulliego z p=0.55
+sample.55<-rbinom(100, 1, .55)
+
+#zobaczmy, wylosowany rozkład
+table(sample.55)
+
+chisq.test(table(sample.55))
+```
+
+Jak widzimy wylosowano prawie idealnie 55% sukcesów, ale w tym przypadku p-value jest ogromne i na żadnym rozsądnym poziomie istotności nie moglibyśmy odrzucić hipotezy zerowe o symetryczności monety przy takich wynikach. 
+
+Test $\chi^2$ (zgodności i niezalezności) można rozszeżyć na zmienne ciągłe poprzez kategoryzowanie ich dzieląc obserwacje na odpowiednie kwantyle. Testy te mają jednak wtedy dość dużo wad i w praktyce żadko sie ich używa w takim przypadku. 

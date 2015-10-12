@@ -1,0 +1,147 @@
+---
+title: "Przedziały ufności w R"
+author: "A. M. Machno"
+date: "6 października 2015"
+output: html_document
+---
+
+##Normalne przedziały ufności dla wartości oczekiwanej
+
+Dla zmiennej $X$ o rozkładzie normalnym ze znaną dystrybuantą $F$, jej realizacja leży w danym przedziale $(a,b)$ z prawdopodobieńtwem $F(b)-F(a)$. 
+
+Zatem, jezeli rozkład średniej z próby prostej jest w przybliżeniu normlany (CTG) to znając wariancję jej rozkładu (chodzi o wariancję średniej!) możemy zbudować przedział ufności dla wartości oczekiwanej. 
+
+Weżmy zatem dane spalania z danych `mtcars` i zbudujmy przedziały ufności dla wartości oczekiwanej. Zakładamy, że odchylenie standardowe jest znane i jest równe odchyleniu z próby. 
+
+```{r}
+data("mtcars")
+
+
+#średnia z próby
+mu<-mean(mtcars$mpg)
+#odchylenie standardowe
+sigma<-sd(mtcars$mpg)
+```
+
+Zatem 90% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qnorm(.95),2)
+```
+
+95% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qnorm(.975),2)
+```
+
+99% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qnorm(.995),2)
+```
+
+**Ważne**: interpretacja otrzymanych wyników jest następująca: jeżeli dane 32 samochodów w zbiorze `mtcars` są reprezentatywne dla pewnej populacji to średnie spalanie w tej populacji na 90% jest w przedziale (18.34,21.84), przy założeniu, że.
+
+##T przedziały ufności
+
+Dla niedostatecznej ilości obserwacji przybliżenie rozkładem normalnym jest nieodpowiednie. Ciężko podać konkretną liczbę obserwacji, dla której przyblizenie jest odpowiednie. Jak widzieliśmy w przykładach na działanie CTG, ta liczba jest różna dla różnych rozkładów. 
+Jeżeli mamy dostęp do odpowiedniego oprogramowania, zawsze bezppieczniej jest użyć rozkładu *t* w budowaniu przedziałóW ufności.
+
+Praktycznie zastępujemy odpowiedni kwantyl rozkładu normlanego kwantylem rozkładu *t*-Gosseta z *n-1* stopniami swobody, gdzie *n* to liczba obserwacji w próbie. Powtórzmy konstrukcję przedziałóW ufności dla spalania, tym razem z przedziałem *t*.
+
+Zatem 90% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qt(.95, 31),2)
+```
+
+95% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qt(.975, 31),2)
+```
+
+99% przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(32)*qt(.995, 31),2)
+```
+
+Widzimy, że wyniki sa bardzo zbliżone, różnice są mniejsze niż 0.1 dla większości krańców przedziałów. Dzieje się tak dlatego, że liczba obserwacji 32 jest dość duża i rozkład *t* z 31 stopniami swobody nienznacznie różni się od rozkładu normlanego.
+
+Zobaczmy teraz co by się stało gdybyśmy mieli tylko 5 obserwacji.
+
+```{r}
+#losujemy 5 obserwacji z danych
+set.seed(21)
+mpg.5<-sample(mtcars$mpg, 5)
+
+#średnia z próby
+mu<-mean(mpg.5)
+#odchylenie standardowe
+sigma<-sd(mpg.5)
+```
+
+Zatem 90% normalny przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qnorm(.95),2)
+```
+
+95% normalny przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qnorm(.975),2)
+```
+
+99% normalny przedział ufności to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qnorm(.995),2)
+```
+
+Zatem 90% przedział ufności *t* to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qt(.95, 4),2)
+```
+
+95% przedział ufności *t* to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qt(.975, 4),2)
+```
+
+99% przedział ufności *t* to:
+```{r}
+round(mu+c(-1,1)*sigma/sqrt(5)*qt(.995, 4),2)
+```
+
+Widzimy, że przedziały z rozkładem *t* są znacznie szersze. 
+
+**Ważne**: w konstrukcji przedziałów ufności *t* nie korzystamy z CTG, te przedziały są poprawne tylko jeżeli rozkład zmiennych jest normalny (z nieznaną średnią i odchyleniem standardowym). W praktyce korzysta się jednak z tych przedziałów nawet jeżeli rozkłady nie są normalne, a inne techniki są niedostępne. 
+
+##Przedział ufności dla wariancji
+
+Przy założeniu normlaności rozkładu (tutaj też często w praktyce pomija się to założenie) wariancja ma zmodyfikowany rozkład $\chi^2$. W łatwy sposób konstruujemy przedziały ufności dla wariancji:
+
+```{r}
+data("mtcars")
+
+
+#średnia z próby
+mu<-mean(mtcars$mpg)
+#odchylenie standardowe
+sigma<-sd(mtcars$mpg)
+```
+
+Zatem 90% przedział ufności dla odchylenia standardowego to:
+```{r}
+round(sqrt(sigma*32/qchisq(c(1-.05,.05), 31)),2)
+```
+
+95% przedział ufności dla odchylenia standardowego to:
+```{r}
+round(sqrt(sigma*32/qchisq(c(1-.025,.025), 31)),2)
+```
+
+99% przedział ufności dla odchylenia standardowego to:
+```{r}
+round(sqrt(sigma*32/qchisq(c(1-.005,.005), 31)),2)
+```
+
+Jako, że wariancja jest ograniczona z dołu (jest nieujemna) to nieraz może nas interesować największa wartość wariancji (odchylenia standardowego) z jakimś prawdopodobieństwem. Analizując dalej ten sam przykład, odchylenie standardowe na 90% nie przekracza:
+
+```{r}
+round(sqrt(sigma*32/qchisq(.1, 31)),2)
+```

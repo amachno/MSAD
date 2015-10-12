@@ -1,0 +1,17 @@
+{
+    "contents" : "\n\n\nlibrary(shiny)\n\nshinyServer(function(input, output) {\n      \n      output$finalPlot <- renderPlot({\n            \n            \n            if(input$type==\"średnia\"){\n                  my.func<-function(mean.mpg){      \n                        data(mtcars)\n                        mpg<-mtcars$mpg\n                        sd.mpg<-input$value\n                        #wektor gęstości\n                        d.vec<-dnorm(mpg, mean.mpg, sd.mpg)\n                  \n                        #log-wiarygodność\n                        sum(log(d.vec))\n                  }\n            \n                  points.lik<-seq(10,30,by=.1)\n                  lik.points<-rep(NA,length(points.lik))\n                  \n                  for (i in 1:length(points.lik)) lik.points[i]<-my.func(points.lik[i])\n                  \n                  my.lab<-\"średnia\"\n            }\n            if(input$type!=\"średnia\"){\n                  my.func<-function(sd.mpg){      \n                        data(mtcars)\n                        mpg<-mtcars$mpg\n                        mean.mpg<-input$value\n                        #wektor gęstości\n                        d.vec<-dnorm(mpg, mean.mpg, sd.mpg)\n                        \n                        #log-wiarygodność\n                        sum(log(d.vec))\n                  }\n                  \n                  points.lik<-seq(1,30,by=.1)\n                  lik.points<-rep(NA,length(points.lik))\n                  \n                  for (i in 1:length(points.lik)) lik.points[i]<-my.func(points.lik[i])\n                  \n                  my.lab<-\"odchylenie standardowe\"\n            }\n            \n            est<-points.lik[lik.points==max(lik.points)]\n            leg<-paste(\"estymator największej wiarygodności jest równy\", as.character(est))\n            \n            plot(points.lik, lik.points, t='l', \n                 xlab=my.lab, ylab=\"log-wiarygodność\")\n            abline(v=est, col=\"red\", lw=2)\n            legend(\"bottomright\", col=\"red\", lw=2, legend=leg)\n            \n\n            \n      })\n      \n\n})\n",
+    "created" : 1444123079706.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1514977359",
+    "id" : "D1373257",
+    "lastKnownWriteTime" : 1444125857,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/shiny/ML_mtcars_mpg/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

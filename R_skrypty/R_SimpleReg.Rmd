@@ -1,0 +1,91 @@
+---
+title: "Regresja prosta w R"
+author: "A. M. Machno"
+date: "8 października 2015"
+output: html_document
+---
+
+##Regresja prosta
+
+Regresja jest to podstawowy model opisujący współzależność zjawisk. Zajmiemy sie w tym rozdziale regresją prostą czyli liniowym opisem zależności dwóch zmiennych. Przeanalizujemy znów przykład na podstawie danych `mtcars`. Funkcja, która dopasowuje model regresji liniowej do danych  w R to `lm`. Zachęcam do dokładnego przeczytrania opisu działania tej funkcji `?lm`.
+
+Zbadajmy liniową zależność między spalaniem, objetością silnika.
+
+```{r, cache=T}
+data(mtcars)
+
+#dopasowujemy model liniowy zależności spalania (zmienna objaśniana) od objętości silnika
+fit.mpg.disp<-lm(mpg~disp, data=mtcars)
+
+#podsumowanie wyników estymacji
+summary(fit.mpg.disp)
+```
+
+W podsumowaniu mamy większość interesujących wartości. Najważniejsze z praktycznego punktu widzenia są parametry modelu. W naszym modelu mamy dwa parametry. Parametr $\beta_0$ (wyraz wolny, `intercept`) interpretujemy jako wartość oczekiwaną zmiennej objaśnianej w przypadku, gry zmienna objaśniająca jest równa 0. W naszym przypadku ta interpretacja jest raczej mało sensowna ponieważ mówi o tym, że gdyby samochód miał silnik o pojemności 0 cu.in. (cale sześcienne) to przejechałby 29.6 mil na galonie. Parametr $\beta_1$ (`disp`) mówi nam ile średnio wzrośnie wartość zmiennej objaśnianej przy wzroście zmiennej objaśniającej o jedną jednostkę. W naszym przypadku, gdy samochód ma pojemność większo o 1 cu.in. to przejeżdża na galonie o średnio 0.04 mili.
+
+Nie mniej ważne od wartości parametrów są istotności parametrów. W naszym przypadku, oba parametry są istotne (ostatnia kolumna tabeli z parametrami, `Pr(>|t|)`)
+
+##Problemy w regresji prostej.
+
+Jest wiele rzeczy na które należy zwrócić uwagę przy budowie modelu. Regresja prosta jest dobrym modelem, aby zrozumieć i skwantyfikować zależność między dwoma zmiennymi. Należy jednak pamiętać, że zalezność między zmiennymi musi być liniowa (w przybliżeniu), aby interpretacja wyników była prawdziwa. 
+Innym problemem są zależności między zmiennymi nie uwzględnionymi w modelu. Bardziej technicznym problemem jest homoskedastyczność, która mówi o tym, iż wariancja jest równa dla każdego poziomu zmiennej objaśniającej. Dla naszego przykładu znaczyłoby to iż odchylenie od średniej spalania dla samochodu z silnikiem o pojemności 160 cu.in. jest takie samo jak dla samochodu z silnikiem 360 cu.in. To założenie w wielu przypadkach nie jest spełnione.
+
+Pierwszym badaniem, czy model regresji liniowej jest odpowiedni jest analiza wykresów. Po pierwsze stwórzmy wykres zależności `mpg`od `disp` oraz narysujmy prostą wyestymowanej regresji.
+
+```{r}
+#dla wygody przypiszemy odpowiednie zmienne do x i y
+x<-mtcars$disp
+y<-mtcars$mpg
+#model regresji dla x i y
+fit.lm<-lm(y~x)
+
+#współczynniki
+beta0<-coef(fit.lm)[1]
+beta1<-coef(fit.lm)[2]
+
+#prosta regresji
+curve(beta0+beta1*x, from = min(x), to = max(x), col='red', ylim=c(min(y), max(y)),
+      xlab='pojemność silnika (cu.in.)', ylab='spalanie (mpg)')
+points(x,y)
+
+```
+
+Aby łatwiej zdiagnozować ewentualne problemy z modelem regresji należy stworzyć wykres reszt z modelu. Reszty z modelu to róznica między zobserwowaną wartościa a wartościa średnią wynikająca z modelu. W przypadku modelu liniowego to odległość w lini pionowej punktu od prostej regresji (punkty pod prostą mają ujemne reszty). Aby stworzyć wktor reszt użyjemy funkcji `resid`.
+
+```{r}
+#tworzymy wektor reszt z modelu
+res.lm<-resid(fit.lm)
+
+#wykres
+plot(x, res.lm,  xlab='pojemność silnika (cu.in.)', ylab='reszta', pch=19, col='red')
+abline(h=0)
+```
+
+##Test modelu
+
+W przypadku modelu regresji prostej, istotność parametrów mówi nam o tym, czy model jest odpowiedni. Dla większej ilości zmiennych objasniających moglibyśmy się zastanawiać czy dodatkowe zmienne wprowadzają dodatkowe informacje do modelu.
+
+W najprostszym przypadku możemy przetestować czy zmienna objaśniana jest rzeczywiście zalezna od zmiennej objaśniającej. Drugim testem jest test czy może  wyraz wolny ($\beta_0$) jest istotnie różny id zera. Do testowania istotności modelu w stosunku do innego modelu (muszą to być modele zagnieżdżone) służy funkcja `anova`.
+
+Zobaczmy jak działa test `anova` w dwóch najprostszych przypadkach. Najpierw regresja liniowa względem modelu bez zmiennej objaśniającej
+
+```{r}
+#dopasowujemy model bez zmiennej x
+fit.0<-lm(y~1)
+
+#przeprowadzamy trst anova dla fit.lm i fit.0
+anova(fit.lm, fit.0)
+```
+
+Zauważmy, że p-value tego modelu jest dokładnie takie jak p-value dla o istotności parametru `disp` w modelu `fit.lm`.
+
+Drugim przypadkiem jest regresja liniowa względem regresji liniowej o wyrazie wolnym równy 0.
+
+```{r}
+#dopasowujemy model z beta0=0
+fit.1<-lm(y~x-1)
+
+#przeprowadzamy trst anova dla fit.lm i fit.1
+anova(fit.lm, fit.1)
+```
+

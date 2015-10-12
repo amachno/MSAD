@@ -1,0 +1,8 @@
+name: CTG_poisson
+account: amachno
+server: shinyapps.io
+bundleId: 281120
+url: https://amachno.shinyapps.io/CTG_poisson
+when: 1444057426.19661
+asMultiple: FALSE
+asStatic: FALSE

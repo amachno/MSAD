@@ -1,0 +1,88 @@
+---
+title: "Funkcje-pętle w R"
+author: "A. M. Machno"
+date: "12 października 2015"
+output: html_document
+---
+
+
+##apply     
+
+Często zdaża się, że chcemy wykonać jakąś operację dla każdej z kolumn lub wierszy macierzy (lub ramki danych, tablicy). Dzięki funkcji `apply` możemy takie operacje wykonać w bardzo szybki sposób. 
+
+Wygenerujmy sobie na początek macierz *40x5* składających się z realizacji rozkładu Poissona o średniej $\lambda =1$. I policzmy średnią oraz medianę dla każdej kolumny, oraz dla każdego wiersza.
+
+```{r}
+#wektor 200 elementowy z rozkładu normalnego
+x<-rnorm(40*5)
+
+#przekształcamy na macierz
+dim(x)<-c(40,5)
+
+#liczymy średnie w wierszach
+r.mean.x<-apply(x, 1, mean)
+#mediany w wierszach
+r.median.x<-apply(x, 1, median)
+
+#Średnie w kolumnach
+c.mean.x<-apply(x, 2, mean)
+#mediany w kolumnach
+c.median.x<-apply(x, 2, median)
+```
+
+Gdybyśmy chcieli użyć funkcji, w której wyniku otrzymujemy wektor dla każdej kolumny (wiersza), wyniki zostaną przedstawione w postaci macierzy. Dodatkowo, jeżeli w użytej funkcji wewnątrz `apply` istnieją dodatkowe argumenty, możemy się do nich odnieść przez ich nazwę wewnątrz wywołania `apply`.
+
+Policzmy rozrzut (minimum i maksimum) w każdej z kolumn `x`. Funkcja `quantile` dla argumentu `probs=0` wylicza minimum, ale dla `probs=1` maksimum (alternatywa dla funkcji `max` i `min`).
+
+```{r}
+apply(x, 2, quantile, probs=c(0,1))
+```
+
+##lapply i sapply
+
+Jeżeli mamy listę i chcemy wykonać tę samą funkcję dla każdego z elementów listy, używamy funkjci `lapply`. Załóżmy, że mamy listę składającą się z wielu zestawów danych i chcemy wyświetlić wymiary każdego ze zbiorów.
+
+```{r}
+#wczytujemy dane wbudowane w R
+data(iris)
+data(mtcars)
+data(InsectSprays)
+
+#tworzymy listę składającaą się z tych danych
+data.list<- list(flowers=iris, cars=mtcars, sprays=InsectSprays)
+
+#wyświetlamy wymiary każdego ze zbiorów
+lapply(data.list, dim)
+```
+
+Wynikiem działania `lapply` jest lista, która ma tyle samo elementów co lista, która jest argumentem funkcji i elementy mają te same nazwy. Elementami w liście są wyniki funkcji dla każdego z elementów wyjściowej listy.
+Często wygodniejsze jest dla nas, aby wyniki były przedstawione w formie wektora (lub macierzy), szczególnie jeżeli wynikiem dziłania funkcji dla każdego elementu jest liczba lub wektor. W takich przypadkach używamy uproszczonej wersji `lapply`, czyli `sapply`.
+
+```{r}
+sapply(data.list, dim)
+```
+
+##tapply
+
+Jeżeli chcemy zadziałać funkcją na wektorze (liście), ale warunkowo to używamy funkcji `tapply`. Jeżeli chcemy abliczyć kwartyle zmiennej `mpg` w zbiorze `mtcars`, ale dla każdego poziomu zmiennej `am` osobno. Tzn. chcemy policzyc kwartyle `mpg` (ilości mil na galonie) w zalezności, czy jest to samochód ze skrzynią automatyczną czy manualną.
+
+```{r}
+q.mpg<-tapply(mtcars$mpg, mtcars$am, quantile, probs=c(.25, .5, .75))
+q.mpg
+```
+
+##split
+
+Aby wykonać operacje analogiczne do `tapply`, ale nie dla wektorów, tylko dla ramek danych, korzystamy najpierw z funkcji `split`. Funkcja `split` dzieli nam dane ze względu na wartość jakiejś zmiennej kategorycznej. 
+
+Gdybyśmy chcieli podzielić dane `mtcars` ze względu na wartość zmiennej `cyl`.
+
+```{r}
+cars.by.cyl<-split(mtcars, mtcars$cyl)
+cars.by.cyl
+```
+
+W wyniku otrzymujemy listę, w której każy element jest ramką danych, o tej samej strukturze co wyjściowa ramka, ale składa się tylko z elementów, gdzie wartość `mtcars$cyl` jest wspólna.
+
+Bardzo często korzystamy ze `split` wraz z `lapply` (lub `sapply`). 
+

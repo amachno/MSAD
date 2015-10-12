@@ -1,0 +1,17 @@
+{
+    "contents" : "\n\n\nlibrary(shiny)\n\nshinyServer(function(input, output) {\n      \n      output$finalPlot <- renderPlot({\n            \n            \n            x    <- rnorm(input$size*10000, input$mean, input$sd)\n            dim(x)<-c(10000, input$size)\n            means<-apply(x, 1, mean)\n            sigma<-input$sd\n            S<-sqrt(input$size)*(means-input$mean)/sigma\n            norms<-rnorm(100000)\n            \n            \n            hist(S, col='blue', freq = F, main=\"Średnia z próby o rozkładzie normalnym\", xlab=\"mean\")\n            lines(density(norms), col='red', lwd=3)\n            legend('topleft', legend=c('normal distribution', 'distribution of the mean'), lty=1 ,col=c('red', 'blue'), lwd=c(3,10))\n            \n            \n      })\n      \n})\n",
+    "created" : 1444056541131.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "69393163",
+    "id" : "E6D67CDF",
+    "lastKnownWriteTime" : 1444056873,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/shiny/CTG_norm/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

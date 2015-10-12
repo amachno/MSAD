@@ -1,0 +1,17 @@
+{
+    "contents" : "\n\n\nlibrary(shiny)\n\nshinyServer(function(input, output) {\n      \n      output$finalPlot <- renderPlot({\n            \n            \n            x    <- rpois(input$size*10000, input$lambda)\n            dim(x)<-c(10000, input$size)\n            means<-apply(x, 1, mean)\n            sigma<-sqrt(input$lambda)\n            S<-sqrt(input$size)*(means-input$lambda)/sigma\n            norms<-rnorm(100000)\n            \n            \n            hist(S, col='blue', freq = F, main=\"Średnia z próby o rozkładzie Poissona\", xlab=\"mean\")\n            lines(density(norms), col='red', lwd=3)\n            legend('topleft', legend=c('normal distribution', 'distribution of the mean'), lty=1 ,col=c('red', 'blue'), lwd=c(3,10))\n            \n            \n      })\n      \n})\n",
+    "created" : 1444056981993.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1615994533",
+    "id" : "3A9CB682",
+    "lastKnownWriteTime" : 1444057203,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/shiny/CTG_poisson/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

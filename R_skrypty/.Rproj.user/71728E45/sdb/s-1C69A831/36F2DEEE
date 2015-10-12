@@ -1,0 +1,18 @@
+{
+    "contents" : "---\ntitle: \"Rozkłady i pętle\"\nauthor: \"A. M. Machno\"\ndate: \"1 października 2015\"\noutput: html_document\n---\n\n##Rozkłady zmiennych losowych\n\nCztery podstawowe funkcje w R związane z rozkładami zmiennych losowych to dystrybuanta, gęstość, kwantyl i próbkowanie. Aby wywołać każdą z funkcji należy wpisać prefiks oraz skrót rozkładu.\n\nPrzykładowe rozkłady:\n\n- normalny `norm`\n- poissona `pois`\n- dwumianowy `binom`\n- jednostajny `unif`\n- wykładniczy `exp`\n\nPrefiksy:\n\n- dystrubuanta `p`\n- gęstość `d`\n- kwantyl `q`\n- próbkowanie `r`\n\nPrzykłady:\n\n```{r}\n#zadanie dodatkowe: po co wpisuję set.seed(1)?\nset.seed(1)\n\n#5 obserwacji z rozkładu normalnego o śrendije 10 i odchyleniu standardowym 16\nrnorm(5, 10, 16)\n\n#dystrybuanta rozkłady wykładniczego o lambda=1 w punkcie 2\npexp(2, 1)\n\n#prawdopodobieństwa kolejnych wyników od 0 do 10 dla zmiennej o rozkładzie poissona z lambda=5\ndpois((0:10), 5)\n\n#Teoretyczne kwartyle rozkładu standardowego normalnego\nqnorm(c(.25,.5,.75))\n```\n\n##If else\n\nCzęsto spotykamy się z sytuacją, w której w zalezności od wartości wykonujemy jakąs akcję lub nie. Do tego służy operator `if`\n\nJeżeli chcemy usunąc zmienną `x` funkcją `rm()` jeżeli jest ona ujemna:\n\n```{r}\nset.seed(21)\n\nx<-rnorm(1)\n\nif (x<0) rm(x)\n\nx\nls()\n```\n\nMożemy spotkać się z sytuacją, w której chcemy uzaleznić akcję od wartości jakiejś zmiennej.\n\nJeżeli chcemy wprowadzić nazwę w jednoelementowym wektorze (nie nazwę obiektu) zależnie czy jest ujemna czy dodatnia:\n\n```{r}\nset.seed(23)\n\nx<-rnorm(1)\n\nif (x<0) {\n      names(x)<-\"ujemna\"\n} else {\n      names(x)<-\"dodatnia\"\n}\n\nx\n\n#zadanie dodatkowe: co by się stało gdyby x równał się 0?\n```\n\n##For\n\nNajczęsciej używaną pętlą jest pętla `for`, która powtarza operację ustalona ilość razy, podstawijąc kolejne zdefiniowane wartości.\n\nTworzymy sumę kwadratów liczb od 0 do 10 (da się to zrobić znacznie prościej):\n\n```{r}\n#ustalamy początkową wartośc jako 0\nsuma<-0\n\n#dodajemy w pętli\nfor (i in 0:10) suma<-suma+i^2\n\n\nsuma\n```\n\nCzęsto w pętli `for` chcemy dać warunek `if else`. Wylosujmy wektor 10 obserwacji z rozkładu standardowego normalnego i nadajmy nazwy obserwacja w zależności czy są dodatnie czy ujemne.\n\n```{r}\nset.seed(32)\nx<-rnorm(10)\n\n#pętla jest dla 1:10, bo tyle elementów w x\nfor (i in 1:10){\n      #piszę w jednej liczni aby pokazać, że jest to mniej czytelne\n      if (x[i]<0) names(x)[i]<-\"ujemna\" else if (x[i]>0) names(x)[i]<-\"dodatnia\"\n}\n\nx\n\n#zadanie dodatkowe: co by się stało gdyby jakiś element x równał się 0?\n```\n\n##While\n\nNieraz chcemy aby jakaś operacja była wykonywana do momentu osiągnięcia jakiegoś wyniku. Chcemy losować obserwacje z rozkładu jednostajnego na odcinku (0,1) do momentu, aż suma będzie wieksza od 10.\n\n```{r}\n#tworzymy pusty wektor\nx<-c()\n\nset.seed(99)\nwhile (sum(x)<=10) x<-c(x,runif(1))\n\nx\n\nsum(x)\n\n#zadanie dodatkowe: co zrobić aby stworzyć wektor, którego suma nie przekracza ustalonej liczby?\n```\n\n",
+    "created" : 1443704814693.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4211048628",
+    "id" : "36F2DEEE",
+    "lastKnownWriteTime" : 1444558297,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/R_Loops_Prob.Rmd",
+    "project_path" : "R_Loops_Prob.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_markdown"
+}

@@ -1,0 +1,17 @@
+{
+    "contents" : "\nlibrary(shiny)\n\nshinyUI(fluidPage(\n      \n      # Application title\n      titlePanel(\"Centralne twierdzenie graniczne dla rozkładu Bernulliego\"),\n      \n      # Sidebar with a slider input for sample size and the probability\n      sidebarLayout(\n            sidebarPanel(\n                  sliderInput(\"size\",\n                              \"Wielkość próby:\",\n                              min = 1,\n                              max = 1000,\n                              value = 10),\n                  sliderInput(\"mean\",\n                              \"Średnia:\",\n                              min = -100,\n                              max = 100,\n                              value = 0,\n                              step = 1),\n                  sliderInput(\"sd\",\n                              \"Odchylenie standardowe:\",\n                              min = 1,\n                              max = 100,\n                              value = 0,\n                              step = 1)\n            ),\n            # Show a plot of the generated distribution\n            mainPanel(\n                  p(\"to jest wizualizacja działania CTG dla rozkładu normalnego\"),\n                  p(\"Na suwaku można określić rozmiar próby, średnią oraz wariancję rozkładu normalnego\"),\n                  p(\"Bez względu na wybór parametrów i rozmiaru próby CTG dobrze przybliża rozkład średniej\"),\n                  plotOutput(\"finalPlot\")\n                  )\n      )\n      ))\n",
+    "created" : 1444056540951.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2173955917",
+    "id" : "9328FD66",
+    "lastKnownWriteTime" : 1444056803,
+    "path" : "C:/Users/Artur/Dropbox/AGH/dydaktyka/statystyka ZiP/2015-2016/R/shiny/CTG_norm/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

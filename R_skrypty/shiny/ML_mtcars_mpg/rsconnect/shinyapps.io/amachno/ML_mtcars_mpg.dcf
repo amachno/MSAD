@@ -1,0 +1,8 @@
+name: ML_mtcars_mpg
+account: amachno
+server: shinyapps.io
+bundleId: 281737
+url: https://amachno.shinyapps.io/ML_mtcars_mpg
+when: 1444126199.03652
+asMultiple: FALSE
+asStatic: FALSE

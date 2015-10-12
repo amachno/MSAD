@@ -1,0 +1,7 @@
+name: Publish Document
+account: rpubs
+server: rpubs.com
+bundleId:
+        https://api.rpubs.com/api/v1/document/115790/a6a353e12a3a46139545addaf0ce5ad9
+url: http://rpubs.com/amachno/115790
+when: 1444420665.1428

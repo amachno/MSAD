@@ -1,0 +1,70 @@
+---
+title: "Listy i ramki danych w R"
+author: "A. M. Machno"
+date: "11 października 2015"
+output: html_document
+---
+
+##Listy
+
+Jeżeli mamy wiele obiektów, które pasuje nam umieścić w innym większym obiekcie, używamy do tego listy. Lista może przechowywać dowolna ilość obiektów, dowolnego typu. Podstawową funkcją tworzącą listę jest `list()`, ale często do istniejącej (nieraz pustej) listy doppisujemy kolejne elementy, ponieważ lista nie ma zdefiniowanej z góry ilości elementów.
+
+Przykład listy składającej się z wektora liczbowe, wektora logicznego i funkcji:
+
+```{r}
+#definiujemy funkcję czy długości wektorów są równe
+l.comp<- function(x,y){
+      if (length(x)==length(y)) TRUE else FALSE
+}
+
+#definiujemy wektor liczbowy
+v.1<- rep(1,3)
+#i wektor logiczny
+v.2<-c(F, T, T, T, T, F, T)
+
+#tworzymy listę
+
+my.list<- list(num.v=v.1, log.v=v.2, fun=l.comp)
+```
+
+Do elementów listy możemy odwołać się na kilka sposobów.
+
+Odwołanie poprzez nazwęobiekty w liście wpisując nazwę listy i po znaku dolara nazwę elementu w liście:
+
+```{r}
+my.list$num.v
+```
+
+Odwołanie poprzez numer elementu w liście wpisując numer w podwójnym nawiasie kwadratowym:
+
+```{r}
+my.list[[2]]
+```
+
+Odwołanie poprzez nazwę w podwójnym nawiasie kwadratowym (wtedy nazwa musi byc w cudzysłowiu):
+
+```{r}
+my.list[["num.v"]]
+```
+
+Możemy chcieć odwołać sie do kilku elementóW listy (podzbiór elementów listy) lub jednego, ale pozostawiając strukturę listy, wtedy wpisujemy w pojedynczym nawiasie kwadratowym wektor wskaźników (liczb naturalnych) odpowiadających elementom listy, które chcemy wyświetlić (lub zapisac w innym elmencie). Podobnie możemy odwołać się przez nazwy elementów (w cudzysłowiu):
+
+```{r}
+my.list[c(1,2)]; my.list[c("num.v", "log.v")]
+```
+
+##Ramki danych
+
+Ramki danych są szczególną formą listy, w której wszystkie lementy są wektorami. Wszystkie z tych wektorów są jednakowej długości. Ramki danych nie są macierzami, ponieważ, nie wszystkie wektory muszą być tej samej klasy (moga występować wektory liczbowe, kategoryczne itd.). Ramki danych są najpopularniejszym sposobem przechowywania danych w środowisku R.
+
+Wczytując dane do środowiska R, są one (o ile to możliwe) przechowywane w postaci ramki danych.
+
+Wczytajmy dane dotyczące kwiatów irysu:
+
+```{r}
+data(iris)
+dim(iris)
+str(iris)
+```
+
+Widzimy, że dane są zapisane w postaci `data.frame`, otrzymujemy 150 obserwacji 5-elementowych. Pierwsze 4 zmienne to zmienne liczbowe, a piąta zmienna to zmienna kategoryczna. 

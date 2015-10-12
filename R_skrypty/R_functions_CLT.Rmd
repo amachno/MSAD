@@ -1,0 +1,147 @@
+---
+title: "Funkcje, estymatory i twierdzenia graniczne"
+author: "A. M. Machno"
+date: "2 października 2015"
+output: html_document
+---
+
+##Tworzenie funkcji
+
+Jak zauważyliśmy wcześniej odchylenie standardowe może być liczone na dwa sposoby.
+
+```{r}
+data(mtcars)
+attach(mtcars)
+
+#wbudowana funkcja
+sd(wt)
+
+#ręcznie
+sqrt(mean((wt-mean(wt))^2))
+```
+
+Wyniki różnią się ze względu na mianownik w ułamku pod pierwiastkiem. Jako, że my używamy drugiego sposobu, chcielibyśmy więc funkcję, która liczy dokładnie w ten sposób. 
+
+```{r}
+#funkcja licząca odchylenie standardowe z n w mianowniku
+
+sd.1<-function(x){
+      #śednia x
+      mean.x<-mean(x)
+      
+      #odchylenia od śreniej x
+      x.dev<-x-mean.x
+      
+      #kwadrat odchyleń od średniej
+      sq.dev<-x.dev^2
+      
+      #średnia kwadratów odchyleń
+      mean.sq<-mean(sq.dev)
+      
+      #wynik
+      sqrt(mean.sq)
+}
+
+sd.1(wt)
+```
+
+Zauważmy, że ostatnia linia w funkcji jest nie przypisywana juz do żadnej zmiennej, jest to ostateczny wynik, który jest zwracany po wywołaniu funkcji. Zmienne wewnątrz funkcji nie sa przechowywane w pamięci podręcznej.
+
+```{r}
+ls()
+```
+
+##Metoda największej wiarygodności
+Załóżmy, że zmienna `mpg` (*miles per gallon*) w zbiorze `mtcars` ma rozkład normalny z odchyleniem standardowym 6 i nieznaną średnią. Zbudujemy funkcję wiarygodności dla tego zagadnienia.
+
+```{r}
+
+#funkcja log-wiarygodności dla średniej w zmiennej mpg i odchylenia standardowego 6
+#jedynym argumentem jest średnia rozkładu
+max.loglik.mpg<-function(mean.mpg){
+      data(mtcars)
+      mpg<-mtcars$mpg
+      sd.mpg<-6
+      #wektor gęstości
+      d.vec<-dnorm(mpg, mean.mpg, sd.mpg)
+      
+      #log-wiarygodność
+      sum(log(d.vec))
+}
+```
+
+Narysujemy wykres log-wiarygodności od wartości średniej (z dokładnością do 0.01).
+
+```{r, cache=T}
+#przedział w jakim badamy to (10,30)
+points.lik<-seq(10,30,by=.01)
+lik.points<-rep(NA,length(points.lik))
+
+for (i in 1:length(points.lik)) lik.points[i]<-max.loglik.mpg(points.lik[i])
+
+plot(points.lik, lik.points, t='l', 
+     xlab="średnia", ylab="log-wiarygodność")
+
+#maksymalna wartość wiarygodności i odpowiadająca jej średni
+max(lik.points); points.lik[lik.points==max(lik.points)]
+```
+
+Dla wizualizacji działania estymacji metodą największej wiarygodności, zapraszam na stronę. [link](https://amachno.shinyapps.io/ML_mtcars_mpg)
+
+##Prawo wielkich liczb
+
+Średnia z niezależnych obserwacji realizacji zmiennych losowych o tym samym rozkładzie wraz ze wzrostem liczebności próby jest bliższa teoretycznej zmiennej rozkładu. Na poniższych wykresach zaprezentowane są 4 wizualizacje tego zjawiska. Wykresy przedstawiaja zmiany średniej z próby wraz ze wzrostem liczebności próby.
+
+```{r, cache=T}
+set.seed(121)
+#konstruujemy 10 000 elementowe próby
+#rozkład standardowy normalny, teoretyczna średnia to 0
+x_snorm<-rnorm(10^4); snorm_mean<-0
+#rozkład wykladniczy z labda 1/10, teoretyczna średnia to 10
+x_exp<-rexp(10^4,1/10); exp_mean<-10
+#rzut symetryczną monetą, prawdopodobieństwo 1 równe prawdopodobieństwo 0 równe 50%. Teoretyczna średnia to oczywiście 1/2
+x_coin<-rbinom(10^4, 1, .5); coin_mean<-.5
+#rzut niesprawiedliwą monetą, gdzie wypadnięcie orła 1 to 90%, teoretyczna średnia to 0.9.
+x_bcoin<-rbinom(10^4,1,.9); bcoin_mean<-.9
+
+#tworzymy wektory średnich, gdzie i-ty element wektora to średnia i pierwszych obserwacji
+snorm_means<-rep(NA, 10^4)
+exp_means<-rep(NA, 10^4)
+coin_means<-rep(NA, 10^4)
+bcoin_means<-rep(NA, 10^4)
+for(i in 1:10^4) snorm_means[i]<-mean(x_snorm[1:i])
+for(i in 1:10^4) exp_means[i]<-mean(x_exp[1:i])
+for(i in 1:10^4) coin_means[i]<-mean(x_coin[1:i])
+for(i in 1:10^4) bcoin_means[i]<-mean(x_bcoin[1:i])
+```
+
+```{r}
+#ustalamy parametr wykresu, aby były 2x2 jako jeden obraz
+par(mfrow=c(2,2))
+#tworzymy wszystkie 4 wykresy z liniami odpowiadającymi teoretycznym średnim
+plot(snorm_means, t="l", 
+     main="Rozkład normalny", xlab="Liczba obserwacji", ylab="średnia")
+abline(h=snorm_mean)
+plot(exp_means, t="l", 
+     main="Rozkład wykładniczy", xlab="Liczba obserwacji", ylab="średnia")
+abline(h=exp_mean)
+plot(coin_means, t="l", 
+     main="Rzut symetryczną monetą", xlab="Liczba obserwacji", ylab="średnia")
+abline(h=coin_mean)
+plot(bcoin_means, t="l", 
+     main="Rzut asymetryczną monetą", xlab="Liczba obserwacji", ylab="średnia")
+abline(h=bcoin_mean)
+```
+
+##Centralne Twierdzenie Graniczne
+
+Uogólnieniem prawa wielkich liczb jest centralne twierdzenie graniczne (CTG). Oprócz informacji na temat średniej z próby mamy infromacje na temat wariancji tej średniej próby. To jednak nie wszystko, wraz ze wzrostem liczebności próby, średnia z próby ma w przybliżeniu rozkład normalny. 
+Jest to bardzo ważna i użyteczna własność, która pozwala w łatwy sposób badać własności średniej. Jeżeli obserwujemy wiele niezależnych obserwacji zmiennej losowej o tym samym rozkładzie i interesuje nas jedynie średni (bądź sumaryczny) wynik, dzięki CTG musimy uzyc własności rokładu normalnego, który jest rozkładem bardzo łatwym do analizy.
+
+Należy byc jednak dość uważnym przy korzystaniu z CTG, ponieważ w przypadku małej liczebności próby rozkład średniej może być daleki od normalnego. Pod poniższymy linkami znjadują się proste aplikacje ilustrujące działanie CTG. 
+
+Dla rozkładu normalnego, CTG działa idealnie, ponieważ suma (i co za tym idzie średnia) zmiennych z rozkładem normalnym ma rozkład normalne. [link](https://amachno.shinyapps.io/CTG_norm)
+
+Rozkład Poissona jest rozkładem dyskretnym, a więc na pierwszy rzut oka może sie wydawać zaskakujące, że średnia z obserwacji z rozkładu Poissona może mieć rozkład normalny. Dla odpowiedniej długości próby CTG działa satysfakcjonująco. [link](https://amachno.shinyapps.io/CLT_poisson)
+
+Rozkład Bernulliego (rzut monetą) jest szczególnie interesujący. Po pierwsze zmienna o rozkładzie Bernulliego może przyjąc tylko dwie wartości (0,1) co czyni CTG nawet bardziej zaskakującym niz w przypadku rozkładu Poissona. Po drugie zmieniając prawdopodobieństwa na mniej symetryczne możemy zaobserwować jak bardzo trzeba byc uważnym przy korzystaniu z CTG. [link](https://amachno.shinyapps.io/CLT_coin)

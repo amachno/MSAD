@@ -1,0 +1,134 @@
+---
+title: "Rozkłady i pętle"
+author: "A. M. Machno"
+date: "1 października 2015"
+output: html_document
+---
+
+##Rozkłady zmiennych losowych
+
+Cztery podstawowe funkcje w R związane z rozkładami zmiennych losowych to dystrybuanta, gęstość, kwantyl i próbkowanie. Aby wywołać każdą z funkcji należy wpisać prefiks oraz skrót rozkładu.
+
+Przykładowe rozkłady:
+
+- normalny `norm`
+- poissona `pois`
+- dwumianowy `binom`
+- jednostajny `unif`
+- wykładniczy `exp`
+
+Prefiksy:
+
+- dystrubuanta `p`
+- gęstość `d`
+- kwantyl `q`
+- próbkowanie `r`
+
+Przykłady:
+
+```{r}
+#zadanie dodatkowe: po co wpisuję set.seed(1)?
+set.seed(1)
+
+#5 obserwacji z rozkładu normalnego o śrendije 10 i odchyleniu standardowym 16
+rnorm(5, 10, 16)
+
+#dystrybuanta rozkłady wykładniczego o lambda=1 w punkcie 2
+pexp(2, 1)
+
+#prawdopodobieństwa kolejnych wyników od 0 do 10 dla zmiennej o rozkładzie poissona z lambda=5
+dpois((0:10), 5)
+
+#Teoretyczne kwartyle rozkładu standardowego normalnego
+qnorm(c(.25,.5,.75))
+```
+
+##If else
+
+Często spotykamy się z sytuacją, w której w zalezności od wartości wykonujemy jakąs akcję lub nie. Do tego służy operator `if`
+
+Jeżeli chcemy usunąc zmienną `x` funkcją `rm()` jeżeli jest ona ujemna:
+
+```{r}
+set.seed(21)
+
+x<-rnorm(1)
+
+if (x<0) rm(x)
+
+x
+ls()
+```
+
+Możemy spotkać się z sytuacją, w której chcemy uzaleznić akcję od wartości jakiejś zmiennej.
+
+Jeżeli chcemy wprowadzić nazwę w jednoelementowym wektorze (nie nazwę obiektu) zależnie czy jest ujemna czy dodatnia:
+
+```{r}
+set.seed(23)
+
+x<-rnorm(1)
+
+if (x<0) {
+      names(x)<-"ujemna"
+} else {
+      names(x)<-"dodatnia"
+}
+
+x
+
+#zadanie dodatkowe: co by się stało gdyby x równał się 0?
+```
+
+##For
+
+Najczęsciej używaną pętlą jest pętla `for`, która powtarza operację ustalona ilość razy, podstawijąc kolejne zdefiniowane wartości.
+
+Tworzymy sumę kwadratów liczb od 0 do 10 (da się to zrobić znacznie prościej):
+
+```{r}
+#ustalamy początkową wartośc jako 0
+suma<-0
+
+#dodajemy w pętli
+for (i in 0:10) suma<-suma+i^2
+
+
+suma
+```
+
+Często w pętli `for` chcemy dać warunek `if else`. Wylosujmy wektor 10 obserwacji z rozkładu standardowego normalnego i nadajmy nazwy obserwacja w zależności czy są dodatnie czy ujemne.
+
+```{r}
+set.seed(32)
+x<-rnorm(10)
+
+#pętla jest dla 1:10, bo tyle elementów w x
+for (i in 1:10){
+      #piszę w jednej liczni aby pokazać, że jest to mniej czytelne
+      if (x[i]<0) names(x)[i]<-"ujemna" else if (x[i]>0) names(x)[i]<-"dodatnia"
+}
+
+x
+
+#zadanie dodatkowe: co by się stało gdyby jakiś element x równał się 0?
+```
+
+##While
+
+Nieraz chcemy aby jakaś operacja była wykonywana do momentu osiągnięcia jakiegoś wyniku. Chcemy losować obserwacje z rozkładu jednostajnego na odcinku (0,1) do momentu, aż suma będzie wieksza od 10.
+
+```{r}
+#tworzymy pusty wektor
+x<-c()
+
+set.seed(99)
+while (sum(x)<=10) x<-c(x,runif(1))
+
+x
+
+sum(x)
+
+#zadanie dodatkowe: co zrobić aby stworzyć wektor, którego suma nie przekracza ustalonej liczby?
+```
+
